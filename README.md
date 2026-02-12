@@ -177,6 +177,7 @@ Users need to log in securely.
 - **Run in a sandbox** — `--dangerously-skip-permissions` means no safety net
 - **Regenerate the plan** when Ralph goes in circles: `./loop.sh plan`
 - **Keep AGENTS.md under 60 lines** — it loads every iteration
+- **Use [spec-view](https://pypi.org/project/spec-view/)** (`pip install spec-view`) — a TUI + web dashboard that gives you a live view of your specs, tasks, and progress. It parses `IMPLEMENTATION_PLAN.md` sections, tracks task completion, and auto-detects the archive convention. Run `spec-view` for the terminal dashboard or `spec-view serve` for the web UI.
 
 ## Safety
 
