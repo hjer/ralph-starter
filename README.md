@@ -28,6 +28,8 @@ cd my-project
 rm -rf .git && git init
 ```
 
+**Or open in a devcontainer** — see [Devcontainer](#devcontainer) below for an isolated, pre-configured environment.
+
 ### 2. Customize AGENTS.md
 
 Edit `AGENTS.md` with your project's:
@@ -179,10 +181,49 @@ Users need to log in securely.
 - **Keep AGENTS.md under 60 lines** — it loads every iteration
 - **Use [spec-view](https://pypi.org/project/spec-view/)** (`pip install spec-view`) — a TUI + web dashboard that gives you a live view of your specs, tasks, and progress. It parses `IMPLEMENTATION_PLAN.md` sections, tracks task completion, and auto-detects the archive convention. Run `spec-view` for the terminal dashboard or `spec-view serve` for the web UI.
 
+## Devcontainer
+
+The repo includes a devcontainer config so you can run the loop in an isolated environment — recommended since `loop.sh` uses `--dangerously-skip-permissions`.
+
+### VS Code / Cursor
+
+1. Install the **Dev Containers** extension
+2. Set your API key as an environment variable on your host:
+   ```bash
+   export ANTHROPIC_API_KEY=sk-ant-...
+   ```
+3. Open the repo and choose **"Reopen in Container"** from the command palette
+4. The container installs Claude CLI automatically — start the loop:
+   ```bash
+   ./loop.sh plan
+   ```
+
+### GitHub Codespaces
+
+1. Add `ANTHROPIC_API_KEY` to your [Codespaces secrets](https://github.com/settings/codespaces)
+2. Create a codespace from this repo
+3. Claude CLI is installed on creation — run `./loop.sh`
+
+### Customizing the container
+
+The devcontainer uses the Ubuntu base image with Node.js (required for Claude CLI). To add your project's runtime, edit `.devcontainer/devcontainer.json` and add features:
+
+```jsonc
+"features": {
+  "ghcr.io/devcontainers/features/node:1": {},
+  "ghcr.io/devcontainers/features/python:1": {},   // Python
+  "ghcr.io/devcontainers/features/rust:1": {},      // Rust
+  "ghcr.io/devcontainers/features/go:1": {}          // Go
+}
+```
+
+See [available features](https://containers.dev/features) for more options.
+
 ## Safety
 
 The loop runs with `--dangerously-skip-permissions`. This means Claude can execute any command without asking. Run in an isolated environment:
 
+- Devcontainer (included — see above)
 - Docker container or VM
 - Only the API keys needed for the task
 - No access to private data beyond the project
