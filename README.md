@@ -183,30 +183,55 @@ Users need to log in securely.
 
 ## Devcontainer
 
-The repo includes a devcontainer config so you can run the loop in an isolated environment — recommended since `loop.sh` uses `--dangerously-skip-permissions`.
+The repo includes a sandboxed devcontainer — recommended since `loop.sh` uses `--dangerously-skip-permissions`. The container has access to **only this repo** and a scoped GitHub token. No access to your home directory, SSH keys, or other repos.
 
-### VS Code / Cursor
+### Prerequisites
 
-1. Install the **Dev Containers** extension
-2. Set your API key as an environment variable on your host:
+- Docker (or [Colima](https://github.com/abiosoft/colima) on macOS)
+- [devcontainer CLI](https://github.com/devcontainers/cli): `npm install -g @devcontainers/cli`
+
+### Setup
+
+1. Copy the env template and fill in your values:
    ```bash
-   export ANTHROPIC_API_KEY=sk-ant-...
+   cp .devcontainer/.env.example .devcontainer/.env
    ```
-3. Open the repo and choose **"Reopen in Container"** from the command palette
-4. The container installs Claude CLI automatically — start the loop:
+
+2. Edit `.devcontainer/.env`:
+   ```
+   GH_TOKEN=github_pat_...
+   GIT_USER_NAME=Your Name
+   GIT_USER_EMAIL=you@example.com
+   ```
+
+   Create a [fine-grained GitHub token](https://github.com/settings/personal-access-tokens/new) scoped to **only this repo** with Contents (read & write) permission.
+
+3. Build and start the container:
    ```bash
-   ./loop.sh plan
+   devcontainer up --workspace-folder .
    ```
 
-### GitHub Codespaces
+4. First time only — login to Claude Code inside the container:
+   ```bash
+   devcontainer exec --workspace-folder . claude
+   ```
+   Run `/login`, then exit. Credentials persist in the mounted `~/.claude` directory.
 
-1. Add `ANTHROPIC_API_KEY` to your [Codespaces secrets](https://github.com/settings/codespaces)
-2. Create a codespace from this repo
-3. Claude CLI is installed on creation — run `./loop.sh`
+### Running the loop
+
+```bash
+# Using run-container.sh (if present)
+./run-container.sh ./loop.sh plan 5
+./run-container.sh ./loop.sh
+
+# Or directly
+devcontainer exec --workspace-folder . ./loop.sh plan
+devcontainer exec --workspace-folder . ./loop.sh
+```
 
 ### Customizing the container
 
-The devcontainer uses the Ubuntu base image with Node.js (required for Claude CLI). To add your project's runtime, edit `.devcontainer/devcontainer.json` and add features:
+Add your project's runtime by editing `.devcontainer/devcontainer.json`:
 
 ```jsonc
 "features": {
@@ -219,15 +244,30 @@ The devcontainer uses the Ubuntu base image with Node.js (required for Claude CL
 
 See [available features](https://containers.dev/features) for more options.
 
+### What the container can access
+
+| Mount | Purpose |
+|---|---|
+| Project directory | Your repo (read-write) |
+| `~/.claude` | Claude Code auth tokens |
+| Shell history volume | Persists across rebuilds |
+
+**Not accessible:** home directory, SSH keys, other repos, macOS keychain. Git push is scoped to the repo(s) your `GH_TOKEN` allows.
+
+### Troubleshooting
+
+- **Claude says "Not logged in"**: Run `claude` interactively inside the container and do `/login` once
+- **git push fails**: Check that `.devcontainer/.env` has a valid `GH_TOKEN` with repo access
+- **"dubious ownership" error**: The `post-start.sh` script handles this — rebuild with `devcontainer up --workspace-folder . --remove-existing-container`
+
 ## Safety
 
-The loop runs with `--dangerously-skip-permissions`. This means Claude can execute any command without asking. Run in an isolated environment:
+The loop runs with `--dangerously-skip-permissions`. This means Claude can execute any command without asking. The devcontainer mitigates this:
 
-- Devcontainer (included — see above)
-- Docker container or VM
-- Only the API keys needed for the task
-- No access to private data beyond the project
-- Restrict network if possible
+- Filesystem isolated to the project directory only
+- Git push scoped via fine-grained GitHub token (single repo)
+- No access to host secrets, SSH keys, or other repos
+- Shell history and Claude auth are the only persistent state
 
 ## Credits
 
