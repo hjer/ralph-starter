@@ -47,9 +47,9 @@ Context updates are mandatory, not optional. Stale docs cause stale decisions.
 
 ## Plan Archive Rules
 
-- When all tasks in a JTBD section of `IMPLEMENTATION_PLAN.md` are done, move the entire `## ` section to `IMPLEMENTATION_PLAN_ARCHIVE.md`
-- Add `archive` to the section's `**Tags:**` line (e.g. `**Tags:** core, ux, archive`)
-- This prevents completed work from being lost when the plan is regenerated
+- Move completed tasks from `IMPLEMENTATION_PLAN.md` to `IMPLEMENTATION_PLAN_ARCHIVE.md`
+- Only move individual done tasks — plan sections stay until all their tasks are complete
+- This keeps the active plan focused and prevents done work from being lost when the plan is regenerated
 
 ## Conventions
 

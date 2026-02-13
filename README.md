@@ -131,9 +131,8 @@ my-project/
 
 ### Archive Convention
 
-When a JTBD is fully complete:
-- **Specs**: Move from `specs/` to `specs/archive/`, set `status: done`
-- **Plan sections**: Move from `IMPLEMENTATION_PLAN.md` to `IMPLEMENTATION_PLAN_ARCHIVE.md`, add `archive` to tags
+- **Specs**: When a spec is fully complete, move from `specs/` to `specs/archive/`, set `status: done`
+- **Plan tasks**: Move completed tasks from `IMPLEMENTATION_PLAN.md` to `IMPLEMENTATION_PLAN_ARCHIVE.md`. Plan sections stay in the plan until all their tasks are done.
 
 This prevents done work from being lost when the plan is regenerated.
 
